@@ -75,7 +75,7 @@ dkms.conf
 
 # Compiled Static libraries
 *.lai
-
+uploads/*
 # Executables
 
 ### CMake ###

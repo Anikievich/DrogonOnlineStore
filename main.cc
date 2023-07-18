@@ -1,0 +1,14 @@
+#include <drogon/drogon.h>
+#include "database/DataBaseHelper.h"
+
+
+
+int main() {
+    //Set HTTP listener address and port
+    drogon::app().addListener("127.0.0.0",1024);
+    //Load config file
+    drogon::app().loadConfigFile("../config.json").run();
+    //Run HTTP framework,the method will block in the internal event loop
+
+    return 0;
+}

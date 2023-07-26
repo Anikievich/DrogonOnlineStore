@@ -7,6 +7,9 @@ void api::typeController::create(const HttpRequestPtr &req, std::function<void(c
     auto result = db->exec("INSERT INTO type (name) VALUES('" + (pNewType.name) + "')");
     db->commit();
 
+    delete db;
+    db = nullptr;
+
     Json::Value ret;
     ret["massage"] = (" Person "  + pNewType.name + " add ");
 
@@ -38,6 +41,8 @@ void api::typeController::getAll(const HttpRequestPtr &req, std::function<void(c
         ret.append(r);
     }
 
+    delete db;
+    db = nullptr;
 
     auto res = HttpResponse::newHttpJsonResponse(ret);
     res->setStatusCode(HttpStatusCode::k200OK);
@@ -48,11 +53,14 @@ void api::typeController::remove(const HttpRequestPtr &req, std::function<void(c
                                  int id)  {
     Json::Value ret;
     try {
-        DatabaseHelper *db = DatabaseHelper::getInstance();
+        DatabaseHelper* db = DatabaseHelper::getInstance();
         auto result = db->exec("DELETE FROM type WHERE id = '" + std::to_string(id) + "' ");
         db->commit();
         auto res = HttpResponse::newHttpJsonResponse(ret);
         res->setStatusCode(HttpStatusCode::k200OK);
+        delete db;
+        db = nullptr;
+
         callback(res);
     }
     catch (const std::runtime_error &e){
@@ -67,6 +75,9 @@ void api::typeController::update(const drogon::HttpRequestPtr &req,
     DatabaseHelper* db = DatabaseHelper::getInstance();
     auto result = db->exec("UPDATE type SET name = '" + (pNewType.name) + "' WHERE id = '" + std::to_string (pNewType.id) + "'");
     db->commit();
+
+    delete db;
+    db = nullptr;
 
     Json::Value ret;
     ret["massage"] = (" Person "  + pNewType.name + " updated ");

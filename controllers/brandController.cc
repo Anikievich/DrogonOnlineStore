@@ -1,10 +1,14 @@
 #include "brandController.h"
+#include <thread>
 
 void api::brandController::create(const HttpRequestPtr &req, std::function<void(const HttpResponsePtr &)> &&callback,
                         Brand::CreateDTO &&pNewBrand) {
     DatabaseHelper* db = DatabaseHelper::getInstance();
     auto result = db->exec("INSERT INTO brand (name) VALUES('" + (pNewBrand.name) + "')");
     db->commit();
+
+    delete db;
+    db = nullptr;
 
     Json::Value ret;
     ret["massage"] = (" Person "  + pNewBrand.name + " add ");
@@ -24,8 +28,8 @@ void api::brandController::getAll(const HttpRequestPtr &req, std::function<void(
     (pNewBrand.page) ? page = pNewBrand.page : page = 1;
     int offset = page * limit - limit;
 
-    DatabaseHelper* db = DatabaseHelper::getInstance();
-    auto result = db->exec("SELECT id, name FROM brand OFFSET '" + (std::to_string(offset)) + "' LIMIT '" + (std::to_string(limit)) + "'");
+    DatabaseHelper* db =  DatabaseHelper::getInstance();
+    auto result = db->exec ("SELECT id, name FROM brand OFFSET '" + (std::to_string(offset)) + "' LIMIT '" + (std::to_string(limit)) + "'");
     db->commit();
 
     for (const auto& d : result) {
@@ -35,6 +39,9 @@ void api::brandController::getAll(const HttpRequestPtr &req, std::function<void(
         ret.append(r);
     }
     //result = db->exec("select count(*) from type");
+
+    delete db;
+    db = nullptr;
 
     auto res = HttpResponse::newHttpJsonResponse(ret);
     res->setStatusCode(HttpStatusCode::k200OK);
@@ -49,6 +56,9 @@ void api::brandController::remove(const HttpRequestPtr &req, std::function<void(
          DatabaseHelper *db = DatabaseHelper::getInstance();
          auto result = db->exec("DELETE FROM brand WHERE id = '" + std::to_string(id) + "' ");
          db->commit();
+        delete db;
+        db = nullptr;
+
         auto res = HttpResponse::newHttpJsonResponse(ret);
         res->setStatusCode(HttpStatusCode::k200OK);
         callback(res);
@@ -64,6 +74,8 @@ void api::brandController::update(const drogon::HttpRequestPtr &req,
     DatabaseHelper* db = DatabaseHelper::getInstance();
     auto result = db->exec("UPDATE brand SET name = '" + (pNewBrand.name) + "' WHERE id = '" + std::to_string (pNewBrand.id) + "'");
     db->commit();
+    delete db;
+    db = nullptr;
 
     Json::Value ret;
     ret["massage"] = (" Person "  + pNewBrand.name + " updated ");

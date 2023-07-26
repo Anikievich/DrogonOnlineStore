@@ -9,11 +9,11 @@
 #include <pqxx/pqxx>
 #include <spdlog/spdlog.h>
 #include "pqxx/types.hxx"
-#include "DataBaseHelper.h"
+//#include "DataBaseHelper.h"
 class DatabaseHelper;
 
-    static DatabaseHelper* instance_ {nullptr};
-    static std::mutex mutex_;
+//    static DatabaseHelper* instance_ {nullptr};
+  //  static std::mutex mutex_;
 
 //DatabaseHelper* instance_ {nullptr};
 

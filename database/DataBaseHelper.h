@@ -3,11 +3,17 @@
 #define ONLINESTORE_DATABASEHELPER_H
 
 #include <pqxx/pqxx>
-#include <spdlog/spdlog.h>
+//#include <spdlog/spdlog.h>
+#include <mutex>
 #include "pqxx/types.hxx"
 #include "Mutex.h"
 #include <trantor/utils/Logger.h>
-
+#include <memory>
+#include <pqxx/connection>
+#include <pqxx/connection.hxx>
+#include <condition_variable>
+#include <queue>
+#include <thread>
 //class DatabaseHelper;
 //static DatabaseHelper* instance_;
 //static std::mutex mutex_;
@@ -15,29 +21,32 @@
 
 class DatabaseHelper{
 private:
-    pqxx::connection c_;
+   // pqxx::connection c_;
     pqxx::work txn_;
+    std::shared_ptr<pqxx::connection> conn_;
+    //pqxx::connection;
+   // std::shared_ptr<pqxx::connection> connection();
+    void freeConnection(std::shared_ptr<pqxx::connection> const &conn_);
+   // static void createPool();
 
+    static std::mutex m_mutex;
+    static std::condition_variable m_condition;
+    static std::queue<std::shared_ptr<pqxx::connection>> m_pool;
+
+    static const int POOL_SIZE = 10;
+    //DatabaseHelper* instance_;
 private:
-
+    static bool fl;
+    //static std::mutex m_mutex;
 
 protected:
+    //static void createPool();
+    explicit DatabaseHelper(std::shared_ptr<pqxx::connection> &conn_) ;
 
-    explicit DatabaseHelper(const char* url) :
-            c_(url ? url : ""), txn_(c_) {
-        if (c_.is_open()) {
-            LOG_ERROR<<"DB is open";
-        }
-        else {
-            LOG_ERROR<<"DB is not open";
-        }
-    }
 
-    ~DatabaseHelper() {
-        txn_.commit();
-    }
 
 public:
+    ~DatabaseHelper();
     DatabaseHelper(DatabaseHelper& other) = delete;
 
     void operator=(const DatabaseHelper&) = delete;
@@ -49,9 +58,8 @@ public:
         txn_.exec("begin;");
     }
 
-    pqxx::result exec(std::string_view query, std::string const& desc = std::string{}) {
-        return txn_.exec(query, desc);
-    }
+    pqxx::result exec(std::string_view query, std::string const& desc = std::string{}) ;
+    pqxx::result exec2(std::string_view query, std::string const& desc = std::string{}) ;
 
     pqxx::result exec(std::stringstream const& query, std::string const& desc = std::string{}) {
         return txn_.exec(query.str(), desc);
@@ -99,7 +107,6 @@ public:
         return txn_.stream<TYPE...>(query);
     }
 };
-
 
 
 

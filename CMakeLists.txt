@@ -16,8 +16,7 @@ else ()
     set(CMAKE_CXX_STANDARD 14)
 endif ()
 
-find_library(PQXX_LIB pqxx)
-find_library(PQ_LIB pq)
+
 
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
@@ -29,14 +28,16 @@ add_executable(${PROJECT_NAME} main.cc controllers/userController.h controllers/
         Middleware/ErrorHandlingMiddleware.cc
         Middleware/ErrorHandlingMiddleware.h error/ApiError.cc error/ApiError.h
         entity/User.cc entity/User.h entity/Brand.cc entity/Brand.h
-        database/DataBaseHelper.cc database/DataBaseHelper.h
+        database/DataBaseHelper.h database/DataBaseHelper.cc
         entity/Device.cc entity/Device.h entity/Type.cc entity/Type.h
         database/Mutex.cc database/Mutex.h imgdump/imgUpload.cpp imgdump/imgUpload.h
         Exception/ForbiddenException.cpp Exception/ForbiddenException.h
-        utils/jwtService.cc utils/jwtService.h Middleware/authMiddleware.cpp Middleware/authMiddleware.h filters/authenticationFilter.cpp filters/authenticationFilter.h filters/authFilter.cc filters/authFilter.h filters/adminRoleFilter.h filters/adminRoleFilter.cc filters/adminRoleFilter.cc filters/adminRoleFilter.cc entity/JwtResponseDTO.cc entity/JwtResponseDTO.h decorators/UpdateDecorators.h decorators/DeviceUpdateDecorator.h entity/Cart.cpp entity/Cart.h)
+        utils/jwtService.cc utils/jwtService.h Middleware/authMiddleware.cpp Middleware/authMiddleware.h filters/authenticationFilter.cpp filters/authenticationFilter.h filters/authFilter.cc filters/authFilter.h filters/adminRoleFilter.h filters/adminRoleFilter.cc filters/adminRoleFilter.cc filters/adminRoleFilter.cc entity/JwtResponseDTO.cc entity/JwtResponseDTO.h decorators/UpdateDecorators.h decorators/DeviceUpdateDecorator.h entity/Cart.cpp entity/Cart.h entity/Rating.cpp entity/Rating.h controllers/api_ratingController.h entity/DeviceInfo.cpp entity/DeviceInfo.h controllers/api_deviceInfoController.h decorators/DeviceInfoUpdateDecorator.cpp decorators/DeviceInfoUpdateDecorator.h)
 
 #add_subdirectory(../jwt-cpp)
 #target_link_libraries(${PROJECT_NAME} PRIVATE jwt-cpp)
+find_library(PQXX_LIB pqxx)
+find_library(PQ_LIB pq)
 
 add_subdirectory(external/libbcrypt)
 target_link_libraries(${PROJECT_NAME} PRIVATE bcrypt)
@@ -49,20 +50,30 @@ target_link_libraries(${PROJECT_NAME} PRIVATE bcrypt)
 #
 # and comment out the following lines
 find_package(Drogon CONFIG REQUIRED)
-find_package(Boost 1.70 COMPONENTS
-        program_options
-        unit_test_framework
-        REQUIRED
-        )
+#find_package(Boost 1.70 COMPONENTS
+#        program_options
+#        unit_test_framework
+#        REQUIRED
+#       )
 
 
 target_link_libraries(
+
         ${PROJECT_NAME} PUBLIC Drogon::Drogon
-        pthread
+        PUBLIC pthread
         fmt
         pq
-        pqxx)
+        PUBLIC pqxx
+)
 
+#target_link_libraries(
+#    server PUBLIC
+#    ${Boost_LIBRARIES}
+#     pthread
+#    fmt
+#    pq
+#   pqxx
+#)
 
 # ##############################################################################
 

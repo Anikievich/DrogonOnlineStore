@@ -9,22 +9,32 @@
 #include <drogon/HttpRequest.h>
 
 namespace Cart {
-    class CreateDTO {
+    class AddDTO {
     public:
-        int deviceID;
+        int userID;
         int cartID;
+        int deviceID;
 
     };
-    class GetAllDTO {   //admin
+    class GetAllDTO {   //ADMIN
     public:
         int limit = 0;
         int page = 0;
     };
-
-    class UpdateDTO {
+    class GetUserCartDTO {   //USER
     public:
-        int id;
-        std::string name;
+        int userID;
+        int cartID;
+        int limit = 0;
+        int page = 0;
+    };
+
+    class RemoveDTO {
+    public:
+        int userID;
+        int cartID;
+        int deviceID;
+
     };
 
 };
@@ -32,39 +42,53 @@ namespace Cart {
 namespace drogon
 {
     template <>
-    inline Cart::CreateDTO fromRequest(const HttpRequest &req)
+    inline Cart::AddDTO fromRequest(const HttpRequest &req)
     {
         const auto& json = req.getJsonObject();
-        Cart::CreateDTO brand;
+        Cart::AddDTO cart;
         if(json)
         {
-            brand.name = (*json)["name"].asString();
+            cart.userID = (*json)["userID"].asInt();
+            cart.deviceID = (*json)["deviceID"].asInt();
         }
-        return brand;
+        return cart;
     }
 
 
     template<>
     inline Cart::GetAllDTO fromRequest(const HttpRequest &req) {
         const auto& json = req.getJsonObject();
-        Cart::GetAllDTO brand;
+        Cart::GetAllDTO cart;
         if(json)
         {
-            brand.limit = (*json)["limit"].asInt();
-            brand.page = (*json)["page"].asInt();
+            cart.limit = (*json)["limit"].asInt();
+            cart.page = (*json)["page"].asInt();
         }
-        return brand;
+        return cart;
     }
     template<>
-    inline Cart::UpdateDTO fromRequest(const HttpRequest &req) {
+    inline Cart::GetUserCartDTO fromRequest(const HttpRequest &req) {
         const auto& json = req.getJsonObject();
-        Cart::UpdateDTO brand;
+        Cart::GetUserCartDTO cart;
         if(json)
         {
-            brand.id = (*json)["id"].asInt();
-            brand.name = (*json)["name"].asString();
+            cart.userID = (*json)["userID"].asInt();
+            cart.limit = (*json)["limit"].asInt();
+            cart.page = (*json)["page"].asInt();
         }
-        return brand;
+        return cart;
+    }
+    template <>
+    inline Cart::RemoveDTO fromRequest(const HttpRequest &req)
+    {
+        const auto& json = req.getJsonObject();
+        Cart::RemoveDTO cart;
+        if(json)
+        {
+            cart.userID = (*json)["userID"].asInt();
+            cart.deviceID = (*json)["deviceID"].asInt();
+        }
+        return cart;
     }
 
 }

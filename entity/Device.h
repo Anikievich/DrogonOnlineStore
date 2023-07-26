@@ -61,8 +61,8 @@ namespace drogon
             device.typeID = (*json)["typeID"].asInt();
             device.info = (*json)["info"];
 
-            device.infoTitle = (*json)["info"]["description"].asString();
-            device.infoDescription = (*json)["info"]["title"].asString();
+            device.infoDescription = (*json)["info"]["description"].asString();
+            device.infoTitle = (*json)["info"]["title"].asString();
 
         }
 

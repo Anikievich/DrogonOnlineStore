@@ -1,6 +1,7 @@
 #include "userController.h"
 
 // Add definition of your processing function here
+
 void api::userController::registration(const HttpRequestPtr &req, std::function<void(const HttpResponsePtr &)> &&callback, User::RegistrationDTO &&pNewUser){
 
    if(pNewUser.email.empty() || pNewUser.password.empty()){
@@ -13,6 +14,8 @@ void api::userController::registration(const HttpRequestPtr &req, std::function<
     LOG_ERROR<< "empty " << (resultEmail.empty());
     if (!resultEmail.empty()){
         callback(ErrorHandlingMiddleware::errorReturn(ApiError::badRequest("A user with the same name already exists.")));
+        delete db;
+        db = nullptr;
         return;
     }
 
@@ -36,11 +39,15 @@ void api::userController::registration(const HttpRequestPtr &req, std::function<
     User::JwtResponseDTO userJwt (pNewUser);
     const auto jwt = jwtService::generateFromUser(userJwt);
 
+    delete db;
+    db = nullptr;
+
     Json::Value ret;
     ret["token"] = jwt;
     auto res = HttpResponse::newHttpJsonResponse(ret);
     res->setStatusCode(HttpStatusCode::k201Created);
     callback(res);
+
 }
 
 void api::userController::login(const HttpRequestPtr &req, function<void(const HttpResponsePtr &)> &&callback,
@@ -52,6 +59,9 @@ void api::userController::login(const HttpRequestPtr &req, function<void(const H
     LOG_ERROR<< "empty " << (resultId.empty());
     if (resultId.empty()){
         callback(ErrorHandlingMiddleware::errorReturn(ApiError::internal("User is not found.")));
+        delete db;
+        db = nullptr;
+
         return;
     }
 
@@ -59,6 +69,8 @@ void api::userController::login(const HttpRequestPtr &req, function<void(const H
 
     if (!(BCrypt::validatePassword(pNewUser.password, resultId.at(0).at("password").get<std::string>().value()))){
         callback(ErrorHandlingMiddleware::errorReturn(ApiError::internal("Wrong password specified.")));
+        delete db;
+        db = nullptr;
         return;
     }
     pNewUser.role = resultId.at(0).at("role").get<std::string>().value();
@@ -69,6 +81,9 @@ void api::userController::login(const HttpRequestPtr &req, function<void(const H
 
     Json::Value ret;
     ret["token"] = jwt;
+
+    delete db;
+    db = nullptr;
 
     auto res = HttpResponse::newHttpJsonResponse(ret);
     res->setStatusCode(HttpStatusCode::k200OK);
@@ -94,6 +109,10 @@ void api::userController::remove(const HttpRequestPtr &req, std::function<void(c
         DatabaseHelper *db = DatabaseHelper::getInstance();
         auto result = db->exec("DELETE FROM user_ WHERE id = '" + std::to_string(id) + "' ");
         db->commit();
+
+        delete db;
+        db = nullptr;
+
         auto res = HttpResponse::newHttpJsonResponse(ret);
         res->setStatusCode(HttpStatusCode::k200OK);
         callback(res);
@@ -127,6 +146,9 @@ void api::userController::update(const drogon::HttpRequestPtr &req,
 
     User::JwtResponseDTO userJwt(pNewUser);
     const auto jwt = jwtService::generateFromUser(userJwt);
+
+    delete db;
+    db = nullptr;
 
     Json::Value ret;
     ret["token"] = jwt;

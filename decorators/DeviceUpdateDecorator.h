@@ -16,7 +16,9 @@ private:
 class Component {
 public:
 
-    virtual ~Component() {}
+    virtual ~Component() {
+
+    }
 
     virtual std::string Operation(bool fl) const = 0;
     // virtual std::string Operation() const = 0;
@@ -53,18 +55,13 @@ public:
     Decorator(Component *component) : component_(component) {
     }
 
-    /**
-     * Декоратор делегирует всю работу обёрнутому компоненту.
-     */
+
     std::string Operation(bool flg) const override {
         return this->component_->Operation(flg);
     }
 };
 
-/**
- * Конкретные Декораторы вызывают обёрнутый объект и изменяют его результат
- * некоторым образом.
- */
+
     class TypeDecorator : public Decorator {
 
     private:
@@ -180,7 +177,15 @@ static std::string ClientCode(Component *component, int id, bool flg = false) {
       Component *price = new PriceDecorator(img, device.price );
       Component *name = new NameDecorator(price, device.name );
 
-      return ClientCode(name, device.id);
+      auto str = ClientCode(name, device.id);
+
+      delete brand;
+      delete type;
+      delete img;
+      delete price;
+      delete name;
+
+      return str;
 
     };
 };

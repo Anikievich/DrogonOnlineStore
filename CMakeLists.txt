@@ -21,14 +21,15 @@ endif ()
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
-add_executable(${PROJECT_NAME} main.cc controllers/userController.h controllers/userController.cc
+add_executable(${PROJECT_NAME} main.cc database/DataBaseHelper.h database/DataBaseHelper.cc
+        controllers/userController.h controllers/userController.cc
         controllers/typeController.cc controllers/typeController.h
         controllers/deviceController.cc  controllers/deviceController.cc
         controllers/brandController.cc controllers/brandController.h
         Middleware/ErrorHandlingMiddleware.cc
         Middleware/ErrorHandlingMiddleware.h error/ApiError.cc error/ApiError.h
         entity/User.cc entity/User.h entity/Brand.cc entity/Brand.h
-        database/DataBaseHelper.h database/DataBaseHelper.cc
+
         entity/Device.cc entity/Device.h entity/Type.cc entity/Type.h
         database/Mutex.cc database/Mutex.h imgdump/imgUpload.cpp imgdump/imgUpload.h
         Exception/ForbiddenException.cpp Exception/ForbiddenException.h
@@ -50,20 +51,31 @@ target_link_libraries(${PROJECT_NAME} PRIVATE bcrypt)
 #
 # and comment out the following lines
 find_package(Drogon CONFIG REQUIRED)
+
+find_package(fmt )
+if (fmt_FOUND)
+    target_include_directories(${PROJECT_NAME} PRIVATE ${fmt_INCLUDE_DIRS})
+    target_link_libraries(${PROJECT_NAME} PRIVATE ${fmt_LIBRARIES})
+endif ()
+
 #find_package(Boost 1.70 COMPONENTS
 #        program_options
 #        unit_test_framework
 #        REQUIRED
 #       )
 
+find_library(PQXX_LIB pqxx)
+find_library(PQ_LIB pq)
+target_include_directories(${PROJECT_NAME} PRIVATE ${PQXX_LIB_INCLUDE_DIRS})
+target_include_directories(${PROJECT_NAME} PRIVATE ${PQ_LIB_INCLUDE_DIRS})
 
 target_link_libraries(
 
         ${PROJECT_NAME} PUBLIC Drogon::Drogon
         PUBLIC pthread
         fmt
-        pq
-        PUBLIC pqxx
+        ${PQXX_LIB}
+        ${PQ_LIB}
 )
 
 #target_link_libraries(

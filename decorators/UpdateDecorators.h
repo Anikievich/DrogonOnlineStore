@@ -99,7 +99,11 @@ public:
         Component *emailDec = new ConcreteComponent(user_.email);
         Component *decorator1 = new ConcreteDecoratorA(emailDec, user_.password);
 
-        return ClientCode(decorator1, user_.id);
+        auto str = ClientCode(decorator1, user_.id);
+
+        delete emailDec;
+        delete decorator1;
+        return str;
 
     };
 };

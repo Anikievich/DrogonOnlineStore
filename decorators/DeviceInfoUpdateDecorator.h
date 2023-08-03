@@ -126,8 +126,13 @@ public:
         Component *deviceId = new DeviceIdDecorator(deviceInfo.deviceID);
         Component *title = new TitleDecorator(deviceId, deviceInfo.title );
         Component *description = new DescriptionDecorator(title, deviceInfo.description );
+        auto str = ClientCode(description, deviceInfo.id);
 
-        return ClientCode(description, deviceInfo.id);
+        delete deviceId;
+        delete title;
+        delete description;
+
+        return str;
 
     };
 };

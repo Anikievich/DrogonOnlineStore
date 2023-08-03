@@ -1,5 +1,5 @@
 #include "brandController.h"
-#include <thread>
+
 
 void api::brandController::create(const HttpRequestPtr &req, std::function<void(const HttpResponsePtr &)> &&callback,
                         Brand::CreateDTO &&pNewBrand) {
